@@ -1,26 +1,10 @@
 import ControladorGestorAutoevaluacion from "../controllers/ControladorGestorAutoevaluacionImpl.js";
-import Periodo from "../controllers/domain/Periodo.js";
+
 import Evaluacion from "../controllers/domain/Evaluacion.js";
 
 export default class GestionAutoevaluacionImpl {
   constructor(cAutoevaluacion) {
     this.controladorAutoevaluacion = cAutoevaluacion;
-  }
-
-  crearPeriodoAcademico(periodo) {
-    // ...
-  }
-
-  obtenerPeriodosAcademicos() {
-    // ...
-  }
-
-  editarPeriodoAcademico(periodo) {
-    // ...
-  }
-
-  eliminarPeriodoAcademico(id) {
-    // ...
   }
 
   enviarNotificacionAutoevaluacion() {
@@ -31,7 +15,7 @@ export default class GestionAutoevaluacionImpl {
     // ...
   }
 
- arAutoevaluacion() {
+  cerrarAutoevaluacion() {
     // ...
   }
 
