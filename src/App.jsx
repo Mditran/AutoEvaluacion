@@ -20,16 +20,16 @@ function App() {
     <Router>
       <Routes>
         <Route
-          path="/"
-          element={isTokenOk ? <Navigate to="/app" /> : <Login />}
+          path="/login"
+          element={localStorage.getItem('auth') ? <Navigate to="/app" /> : <Login />}
         />
         <Route
           path="/app/*"
           element={
-            isTokenOk ? (
+            localStorage.getItem('auth') ? (
               <Layout />
             ) : (
-              <Navigate to="/" replace state={{ from: '/app' }} />
+              <Navigate to="/login" replace state={{ from: '/app' }} />
             )
           }
         />

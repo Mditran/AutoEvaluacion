@@ -15,6 +15,13 @@ import Dashboard from '../views/Dashboard';
 const Layout = () => {
 	const [open, setOpen] = useState(true);
 	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		console.log('Entro');
+		localStorage.removeItem('auth');
+		window.location.href = '/login';
+	};
+	
 	const Menus = [
 		{ title: 'Dashboard', src: `${Chart_fill}`, path: '' },
 		{ title: 'Periodos', src: `${Chat}`, path: '/app/periodos' },
@@ -23,8 +30,12 @@ const Layout = () => {
 		{ title: 'Search', src: `${Search}`, path: '/app/search' },
 		{ title: 'Analytics', src: `${Chart}`, path: '/app/analytics' },
 		{ title: 'Files', src: `${Folder}`, gap: true, path: '/app/files' },
-		{ title: 'Log out', src: 'Log_out', path: '/logout' },
+		{ title: 'Log out', src: 'Log_out', path: handleLogout  },
 	];
+
+	
+
+
 	return (
 		<div className="flex">
 		<div
@@ -65,7 +76,11 @@ const Layout = () => {
 					index === 0 && 'bg-light-white'
 				} `}
 				onClick={() => {
-					navigate(Menu.path);
+					if (typeof Menu.path === 'function') {
+						Menu.path();
+					} else {
+						navigate(Menu.path);
+					}
 				}}
 				>
 				<img src={Menu.src} alt="" />

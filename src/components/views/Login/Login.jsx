@@ -24,7 +24,8 @@ const Login = () => {
         .then(({data}) => {
             console.log('NO SE QUE PASA');
             localStorage.setItem('auth', true)
-            navigate('/app')
+            window.location.href = '/app';
+            //navigate('/app')
         })
         .catch(({response})=>{
             console.log(response)
