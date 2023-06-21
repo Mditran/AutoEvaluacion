@@ -4,17 +4,18 @@ import ApiRequest from '../../../helpers/axiosInstances'
 const EvaluacionC = () => {
  //const url = 'http://localhost/4000/api';
     const initialState = {
-        per_id: 1,
+        per_id: 0,
         per_nombre: "",
         per_fechainicio: "",
         per_fechafin: "",
         per_anno: "",
         per_semestre: ""
 	}
-    const initialStateUser = {
+    const initialStateUser = [{
+        usr_identificacion: "",
         usr_nombre: "",
         usr_apellido: ""
-	}
+	}]
 
     const initialStatePeriodo = {
         per_id: "",
@@ -46,9 +47,15 @@ const EvaluacionC = () => {
 	}
 
     const getUsuario = async () => {
-		const { data } = await ApiRequest().get('/usuario', { id: isId })
-		setUsuario(data);
-        setIsFound(true);
+        console.log(isId);
+        await ApiRequest().post('/usuario', { id: isId })
+        .then(({data}) => {
+            setUsuario(data);
+            setIsFound(true);
+        })
+        .catch(({response})=>{
+            console.log(response)
+        })
 	}
 
     const getPeirodos2 = async () => {
@@ -134,9 +141,13 @@ const EvaluacionC = () => {
                             <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
                         </div>
                         <div className='flex'>
-                            <input type="text" id="table-search" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={isId} placeholder="Search"/>
+                            <input type="text" id="table-search" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={isId} onChange={(e)=>{
+                                setIsId(e.target.value)
+                                console.log(e.target.value);
+                            }} laceholder="Search"/>
                             <button className='bg-cyan-600 text-gray-300 p-1 px-3 rounded-e' onClick={()=>{
                                 getUsuario()
+                                body.per_id = 0
                             }}>Buscar</button>
                         </div>
                     </div>
@@ -152,38 +163,46 @@ const EvaluacionC = () => {
                 <table className="sticky w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope='col' className='border px-6 py-3'>Periodo</th>
                             <th scope='col' className='border px-6 py-3'>
+                                <div className='flex items-center'>
+                                    <p className='pr-6 justify-center items-center'>Periodo</p>
+                                
                                 <select
                                 
-                                name="lab_id"
+                                name="per_id"
                                 style={{
                                     backgroundColor: 'withe',
                                     padding: '8px',
                                     borderRadius: '4px',
-                                    width: '100%',
+                                    width: '70%',
                                     color: 'lighgray',
                                     fontSize: '14px',
                                 }}
-                                value={body.lab_id}
-                                onChange={onChange}
+                                value={body.per_id}
+                                onChange={()=>{
+                                    onChange()
+                                    
+                                }}
+                                onSelect={(e)=>{
+                                    console.log('Se selecciono', e.target.value);
+                                }}
                                 >
-                                    <option value="">Seleccionar Periodo</option>
+                                    <option value={0}>Seleccionar Periodo</option>
                                     {periodos.map(periodo => (
                                         <option key={periodo.per_id} value={periodo.per_id}>{periodo.per_nombre}</option>
                                     ))}  
                                 </select>
+                                </div>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
+                        
                         <tr>
-                            <td className='border px-6 py-4'>Nombre: </td>
-                            <td className='border px-6 py-4'>{usuario.usr_nombre} {usuario.usr_apellido}</td>
+                            <td className='border px-6 py-4 flex'><p className='pr-28'>Nombre:</p> {usuario[0].usr_nombre} {usuario[0].usr_apellido}</td>
                         </tr>
                         <tr>
-                            <td className='border px-6 py-4'>{`Identificacion (Docente): `}</td>
-                            <td className='border px-6 py-4'>{usuario.usr_identificacion}</td>
+                            <td className='border px-6 py-4 flex'><p className='pr-4'>{`Identificacion (Docente): `}</p>{usuario[0].usr_identificacion}</td>
                         </tr>
                     </tbody>
                 </table>

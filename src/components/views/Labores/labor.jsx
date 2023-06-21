@@ -3,7 +3,7 @@ import ApiRequest from '../../../helpers/axiosInstances'
 import 'react-datepicker/dist/react-datepicker.module.css'
 
 
-const Labor = ({ open, setOpen }) => {
+const Labor = () => {
 
     //const url = 'http://localhost/4000/api';
     const initialState = {
@@ -240,8 +240,6 @@ const Labor = ({ open, setOpen }) => {
         </div>
     )
 }
-
-
 
 
 export default Labor

@@ -56,11 +56,11 @@ const Layout = () => {
 	});
 
 	return (
-		<div className="flex">
+		<div className="flex h-100%">
 		<div
 			className={` ${
 			open ? 'w-72' : 'w-20 '
-			} bg-gray-950 text-gray-300 h-screen p-5  pt-8 relative duration-300`}
+			} bg-gray-950 text-gray-300 h-screen p-5 pt-8 relative duration-300`}
 		>
 			<img
 			src={Control}
