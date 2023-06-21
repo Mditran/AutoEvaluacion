@@ -6,6 +6,9 @@ const EvaluacionC = () => {
     const initialState = {
         per_id: 0,
         per_nombre: "",
+        lab_id: "",
+        lab_nombre: "",
+        lab_descripcion: "",
         per_fechainicio: "",
         per_fechafin: "",
         per_anno: "",
@@ -181,7 +184,7 @@ const EvaluacionC = () => {
                                 value={body.per_id}
                                 onChange={()=>{
                                     onChange()
-                                    
+
                                 }}
                                 onSelect={(e)=>{
                                     console.log('Se selecciono', e.target.value);
@@ -210,12 +213,16 @@ const EvaluacionC = () => {
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope='col' className='border px-6 py-3'>#</th>
-                            <th scope='col' className='border px-6 py-3'>Nombre</th>
+                            <th scope='col' className='border px-6 py-3'>Nombre de Labor</th>
+                            <th scope='col' className='border px-6 py-3'>Tipo Labor</th>
+                            <th scope='col' className='border px-6 py-3'>Horas</th>
+                            <th scope='col' className='border px-6 py-3'>Descripcion</th>
+                            <th scope='col' className='border px-6 py-3'>{`ACTO(Si aplica)`}</th>
                             <th scope='col' className='border px-6 py-3'>Fecha inicio</th>
                             <th scope='col' className='border px-6 py-3'>Fecha fin</th>
-                            <th scope='col' className='border px-6 py-3'>Año</th>
-                            <th scope='col' className='border px-6 py-3'>Semestre</th>
-                            <th scope='col' className='border px-6 py-3'>Acciones</th>
+                            <th scope='col' className='border px-6 py-3'>Estado</th>
+                            <th scope='col' className='border px-6 py-3'>Resultados</th>
+                            <th scope='col' className='border px-6 py-3'>Evaluacion</th>
                         </tr>
                     </thead>
                     <tbody>
