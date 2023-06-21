@@ -8,7 +8,7 @@ import axios from 'axios'
 
 const Login = () => {
     const [body, setBody] = useState({ username: '', password: '' })
-    const navigate = useNavigate()
+    //const navigate = useNavigate()
     //const classes = useStyles()
 
     const handleChange = e => {
@@ -22,10 +22,9 @@ const Login = () => {
         e.preventDefault()
         axios.post('http://localhost:4000/api/login', body)
         .then(({data}) => {
-            console.log('NO SE QUE PASA');
             localStorage.setItem('auth', true)
+            localStorage.setItem('userData', JSON.stringify(data));
             window.location.href = '/app';
-            //navigate('/app')
         })
         .catch(({response})=>{
             console.log(response)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Control from '../../assets/img/control.png';
 import Logo from '../../assets/img/Logo.png';
 import Chart_fill from '../../assets/img/Chart_fill.png';
@@ -9,34 +9,51 @@ import Calendar from '../../assets/img/Calendar.png';
 import Search from '../../assets/img/Search.png';
 import Chart from '../../assets/img/Chart.png';
 import Folder from '../../assets/img/Folder.png';
-import Periodo from '../views/Periodos';
+import Logout from '../../assets/img/Logout.png';
 import Dashboard from '../views/Dashboard';
 import Labor from '../views/Labores';
+import Periodo from '../views/Periodos';
+import EvaluacionC from '../views/EvaluacionC';
 
 const Layout = () => {
 	const [open, setOpen] = useState(true);
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
-		console.log('Entro');
+
 		localStorage.removeItem('auth');
+		localStorage.removeItem('userData');
 		window.location.href = '/login';
 	};
 	
+    const token = JSON.parse(localStorage.getItem('userData')).rol_id;
+
+
 	const Menus = [
-		{ title: 'Dashboard', src: `${Chart_fill}`, path: '' },
-		{ title: 'Periodos', src: `${Chat}`, path: '/app/periodos' },
-		{ title: 'Accounts', src: `${User}`, gap: true, path: '/app/accounts' },
-		{ title: 'Schedule', src: `${Calendar}`, path: '/app/schedule' },
-		{ title: 'Search', src: `${Search}`, path: '/app/search' },
-		{ title: 'Analytics', src: `${Chart}`, path: '/app/analytics' },
-		{ title: 'Files', src: `${Folder}`, gap: true, path: '/app/files' },
-		{ title: 'Log out', src: 'Log_out', path: handleLogout  },
-		{ title: 'Labores', src: `${Chat}`,path:'/app/labores'}
+		{ title: 'Dashboard', src: `${Chart_fill}`, path: '', token: 0, state: false },
+		{ title: 'Notificacion', src: `${Chat}`, path: '/app/notificaciones', token: 1, state: false },
+		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionD', token: 2, state: false },
+		{ title: 'Evaluacion', src: `${Chart}`, gap: true, path: '/app/evaluacionC', token: 1, state: false },
+		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionP', token: 3, state: false },
+
+		{ title: 'Periodos', src: `${Calendar}`, path: '/app/periodos', token: 1, state: false },
+		{ title: 'Labores', src: `${Chat}`,path:'/app/labores', token: 0, state: false},
+
+		{ title: 'Schedule', src: `${Calendar}`, path: '/app/schedule', token: 0, state: false },
+		{ title: 'Search', src: `${Search}`, path: '/app/search', token: 0, state: false },
+		{ title: 'Analytics', src: `${Chart}`, path: '/app/analytics', token: 0, state: false },
+		{ title: 'Files', src: `${Folder}`, path: '/app/files', token: 2, state: false },
+		{ title: 'Log out', src: `${Logout}`, gap: true, path: handleLogout, token: 0, state: false },
 	];
 
-	
-
+	Menus.map((Menu, index) => {
+		if (token === Menu.token || Menu.token === 0) {
+			Menu.state = true;
+		}else if(token === 2){
+			Menu.state = true;
+		}
+		return Menu;
+	});
 
 	return (
 		<div className="flex">
@@ -66,14 +83,12 @@ const Layout = () => {
 				!open && 'scale-0'
 				}`}
 			>
-				Designer
+				Evalcoor App
 			</h1>
 			</div>
 			<ul className="pt-6">
 			{Menus.map((Menu, index) => (
-				<li
-				key={index}
-				className={`flex  rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 
+				Menu.state? (<li key={index} className={`flex  rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 
 			${Menu.gap ? 'mt-9' : 'mt-2'} ${
 					index === 0 && 'bg-light-white'
 				} `}
@@ -91,7 +106,7 @@ const Layout = () => {
 				>
 					{Menu.title}
 				</span>
-				</li>
+				</li>): null
 			))}
 			</ul>
 		</div>
@@ -99,7 +114,11 @@ const Layout = () => {
 			<Routes>
 			<Route path="/" element={<Dashboard />} />
 			<Route path="/periodos" element={<Periodo />} />
-			<Route path="/labores" element={<Labor/>} />
+			<Route path="/labores" element={(token === 1)? <Labor /> : <Navigate to="/app" />} />
+			<Route path="/periodos" element={(token === 1)? <Periodo /> : <Navigate to="/app" />} />
+			<Route path="/evaluacionC" element={(token === 1)? <EvaluacionC /> : <Navigate to="/app" />} />
+			<Route path="/evaluacionD" element={(token === 2)? <Periodo /> : <Navigate to="/app" />} />
+			<Route path="/evaluacionP" element={((token === 3) || (token === 4) || (token === 5))? <Periodo /> : <Navigate to="/app" />} />
 			</Routes>
 		</div>
 		</div>

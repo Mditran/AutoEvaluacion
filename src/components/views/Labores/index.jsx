@@ -1,1 +1,1 @@
-export { default } from './labor'
+export { default } from './Labor'

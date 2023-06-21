@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/views/Login';
 import Layout from './components/Layout/Layout';
 
 function App() {
-  const [isTokenOk, setIsTokenOk] = useState(true);
+  
+/*   const [isTokenOk, setIsTokenOk] = useState(true);
 
   const init = () => {
     if (localStorage.getItem('auth')) {
@@ -14,11 +15,15 @@ function App() {
     }
   };
 
-  useEffect(init, []);
+  useEffect(init, []); */
 
   return (
     <Router>
       <Routes>
+      <Route
+          path="/"
+          element={localStorage.getItem('auth') ? <Navigate to="/app" /> : <Navigate to="/login" />}
+        />
         <Route
           path="/login"
           element={localStorage.getItem('auth') ? <Navigate to="/app" /> : <Login />}
