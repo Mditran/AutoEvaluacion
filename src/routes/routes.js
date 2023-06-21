@@ -9,6 +9,7 @@ const Layout = lazy(() => import('../components/Layout'));
 const Dashboard = lazy(() => import('../components/views/Dashboard'));
 const Periodos = lazy(() => import('../components/views/Periodos'));
 const AutoEvaluaciones = lazy(() => import('../components/views/AutoEvaluaciones'));
+const Labores = lazy(() => import('../components/views/Labores'));
 
 const routes = [
   {
@@ -34,6 +35,11 @@ const routes = [
         path: `/${APP_VALUES.ROOT_ROUTE}/autoevaluaciones`,
         exact: true,
         component: AutoEvaluaciones
+      },
+      {
+        path: `/${APP_VALUES.ROOT_ROUTE}/labores`,
+        exact: true,
+        component: Labores
       },
       {
         path: `/${APP_VALUES.ROOT_ROUTE}/periodos`,

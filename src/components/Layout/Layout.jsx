@@ -11,6 +11,7 @@ import Chart from '../../assets/img/Chart.png';
 import Folder from '../../assets/img/Folder.png';
 import Periodo from '../views/Periodos';
 import Dashboard from '../views/Dashboard';
+import Labor from '../views/Labores';
 
 const Layout = () => {
 	const [open, setOpen] = useState(true);
@@ -31,6 +32,7 @@ const Layout = () => {
 		{ title: 'Analytics', src: `${Chart}`, path: '/app/analytics' },
 		{ title: 'Files', src: `${Folder}`, gap: true, path: '/app/files' },
 		{ title: 'Log out', src: 'Log_out', path: handleLogout  },
+		{ title: 'Labores', src: `${Chat}`,path:'/app/labores'}
 	];
 
 	
@@ -97,6 +99,7 @@ const Layout = () => {
 			<Routes>
 			<Route path="/" element={<Dashboard />} />
 			<Route path="/periodos" element={<Periodo />} />
+			<Route path="/labores" element={<Labor/>} />
 			</Routes>
 		</div>
 		</div>
