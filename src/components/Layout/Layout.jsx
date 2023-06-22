@@ -11,7 +11,7 @@ import Chart from '../../assets/img/Chart.png';
 import Folder from '../../assets/img/Folder.png';
 import Logout from '../../assets/img/Logout.png';
 import Dashboard from '../views/Dashboard';
-import Labor from '../views/Labores';
+import Labor from '../views/Labores/Labor';
 import Periodo from '../views/Periodos';
 import EvaluacionC from '../views/EvaluacionC';
 
@@ -33,10 +33,10 @@ const Layout = () => {
 		{ title: 'Dashboard', src: `${Chart_fill}`, path: '', token: 0, state: false },
 		{ title: 'Notificacion', src: `${Chat}`, path: '/app/notificaciones', token: 1, state: false },
 		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionD', token: 2, state: false },
-		{ title: 'Evaluacion', src: `${Chart}`, gap: true, path: '/app/evaluacionC', token: 1, state: false },
+		{ title: 'Evaluacion', src: `${Chart}`, gap: true, path: '/app/evaluacionC', token: 0, state: false },
 		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionP', token: 3, state: false },
 
-		{ title: 'Periodos', src: `${Calendar}`, path: '/app/periodos', token: 1, state: false },
+		{ title: 'Periodos', src: `${Calendar}`, path: '/app/periodos', token: 0, state: false },
 		{ title: 'Labores', src: `${Chat}`,path:'/app/labores', token: 0, state: false},
 
 		{ title: 'Schedule', src: `${Calendar}`, path: '/app/schedule', token: 0, state: false },
@@ -114,9 +114,9 @@ const Layout = () => {
 			<Routes>
 			<Route path="/" element={<Dashboard />} />
 			<Route path="/periodos" element={<Periodo />} />
-			<Route path="/labores" element={(token === 1)? <Labor /> : <Navigate to="/app" />} />
+			<Route path="/labores" element={ <Labor/>} />
 			<Route path="/periodos" element={(token === 1)? <Periodo /> : <Navigate to="/app" />} />
-			<Route path="/evaluacionC" element={(token === 1)? <EvaluacionC /> : <Navigate to="/app" />} />
+			<Route path="/evaluacionC" element={<EvaluacionC />} />
 			<Route path="/evaluacionD" element={(token === 2)? <Periodo /> : <Navigate to="/app" />} />
 			<Route path="/evaluacionP" element={((token === 3) || (token === 4) || (token === 5))? <Periodo /> : <Navigate to="/app" />} />
 			</Routes>
