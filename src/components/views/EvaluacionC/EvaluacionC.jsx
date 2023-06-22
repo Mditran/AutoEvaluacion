@@ -4,30 +4,32 @@ import ApiRequest from '../../../helpers/axiosInstances'
 const EvaluacionC = () => {
  //const url = 'http://localhost/4000/api';
     const initialState = {
+        eva_id: 0,
+        lab_id: 0,
+        lab_nombre: "",
+        tl_id: 0,
+        tl_descripcion: "",
+        lab_descripcion: "",
+        lab_horas: 0,
         per_id: 0,
         per_nombre: "",
-        lab_id: "",
-        lab_nombre: "",
-        lab_descripcion: "",
         per_fechainicio: "",
         per_fechafin: "",
-        per_anno: "",
-        per_semestre: ""
+        usr_identificacion: 0,
+        rol_id: 0,
+        
+        eva_estado:"En ejecucion",
+        eva_resultado:"",
+        eva_puntaje: 0,
 	}
     const initialStateUser = [{
         usr_identificacion: "",
         usr_nombre: "",
-        usr_apellido: ""
+        usr_apellido: "",
+        user_rol:0
 	}]
 
-    const initialStatePeriodo = {
-        per_id: "",
-        per_nombre: ""
-	}
-
-    
-
-	const [periodoList, setPeriodoList] = useState([]);
+	const [evaluacionList, setEvaluacionList] = useState([]);
 	const [body, setBody] = useState(initialState);
 	const [title, setTitle] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -37,61 +39,108 @@ const EvaluacionC = () => {
 	const [isId, setIsId] = useState('');
 	const [usuario, setUsuario] = useState(initialStateUser);
 	const [periodos, setPeriodos] = useState([]);
+	const [labores, setLabores] = useState([]);
 	const [isEdit, setIsEdit] = useState(false);
+	const [isSelected, setIsSelected] = useState(false);
 	const [isFound, setIsFound] = useState(false);
 	const [mensaje, setMensaje] = useState({ ident: null, message: null, type: null })
-
+    let totalHoras = 0;
 
     
 
-    const getPeriodos = async () => {
-		const { data } = await ApiRequest().get('/periodos')
-		setPeriodoList(data)
+    const getEvaluaciones = async (idPeriodo) => {
+		const { data } = await ApiRequest().post('/evaluaciones', {usr_identificacion: usuario[0].usr_identificacion, per_id: idPeriodo})
+        //console.log(data);
+		setEvaluacionList(data)
+	}
+
+    const getLabores = async (idPeriodo) => {
+		const { data } = await ApiRequest().get('/labores2')
+        //console.log(data);
+		setLabores(data)
 	}
 
     const getUsuario = async () => {
-        console.log(isId);
-        await ApiRequest().post('/usuario', { id: isId })
+        //console.log(isId);
+        try {
+            const { data } = await ApiRequest().post('/usuario', { id: isId })
+            //console.log('data:',data);
+            totalHoras = 0;
+            if(data.length>0){
+                setUsuario(data);
+                setIsFound(true);
+                setEvaluacionList([])
+                getPeirodos2()
+            }else{
+                setUsuario(initialStateUser)
+                setIsFound(false)
+                //console.log('El docente no existe1');
+            }
+        }
+        catch({response}){
+            setUsuario(initialStateUser)
+            setEvaluacionList([])
+            setIsFound(false)
+            //console.log('El docente no existe');
+        }
+	}
+
+    const getPeirodos2 = async () => { 
+        await ApiRequest().post('/periodos2', {usr_identificacion: usuario[0].usr_identificacion})
         .then(({data}) => {
-            setUsuario(data);
-            setIsFound(true);
+            setPeriodos(data);
+            console.log(data);
         })
         .catch(({response})=>{
             console.log(response)
         })
-	}
-
-    const getPeirodos2 = async () => {
-        
-		const { data } = await ApiRequest().get('/periodos2')
-		setPeriodos(data)
 	} 
 
     useEffect(()=>{
-		getPeriodos();
-        getPeirodos2()
+        
     }, [])
 
-        const onChange = ({ target }) => {
-            const { name, value } = target
-            setBody({
-                ...body,
-                [name]: value
-            });
-            //setSelectedPeriodo(value !== "");
-        };
+    const onChange = ({ target }) => {
+        const { name, value } = target
+        setBody({
+            ...body,
+            [name]: value
+        });
+        //setSelectedPeriodo(value !== "");
+    };
 
-    	const onSubmit = async () => {
-            setShowModal(false)
-            try {
-                await ApiRequest().post('/periodos/guardar', body)
-                setBody(initialState)
-                getPeriodos()
-                
-            } catch ({ response }) {
-                
+    const handleHora = (hora) => {
+        totalHoras = totalHoras + hora;
+    };
+
+    const onSubmit = async () => {
+        setShowModal(false);
+        body.usr_identificacion = usuario[0].usr_identificacion;
+        body.rol_id = usuario[0].rol_id;
+        body.lab_id = Number(body.lab_id);
+        body.per_id = Number(body.per_id);
+        
+
+        try {
+            await ApiRequest().post('/evaluaciones/guardar', body);
+            setBody(initialState);
+            setIsSelected(false);
+            /* getEvaluaciones(); */
+        } catch (error) {
+            if (error.response) {
+            // Error de respuesta del servidor (con código de estado y datos de error)
+            const { status, data } = error.response;
+            console.log('Código de estado:', status);
+            console.log('Datos de error:', data);
+            } else if (error.request) {
+            // Error de solicitud sin respuesta del servidor
+            console.log('Error de solicitud:', error.request);
+            } else {
+            // Otros errores
+            console.log('Error:', error.message);
             }
         }
+    };
 
         const onEdit = async () => {
             try {
@@ -105,7 +154,7 @@ const EvaluacionC = () => {
                     message: data.message,
                     type: 'success'
                 })
-                getPeriodos()
+                getEvaluaciones()
             } catch ({ response }) {
                 setMensaje({
                     ident: new Date().getTime(),
@@ -123,7 +172,7 @@ const EvaluacionC = () => {
                         message: data.message,
                         type: 'success'
                     })
-                    getPeriodos()
+                    getEvaluaciones()
                 } catch ({ response }) {
                     setMensaje({
                         ident: new Date().getTime(),
@@ -138,30 +187,31 @@ const EvaluacionC = () => {
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <div className="pb-4 bg-white dark:bg-gray-900">
                     <label htmlFor="table-search" className="sr-only">Search</label>
-                        <div className='flex justify-between pl-5 pr-10'>
-                    <div className="relative mt-1">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                    <div className='flex  pl-5 pr-10'>
+                        <div className="relative mt-1 mr-12">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path></svg>
+                            </div>
+                            <div className='flex'>
+                                <input type="text" id="table-search" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-s-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={isId} onChange={(e)=>{
+                                    setIsId(e.target.value)
+                                    //console.log(e.target.value);
+                                }} laceholder="Search"/>
+                                <button className='bg-cyan-600 text-gray-300 p-2 px-3 rounded-e' onClick={()=>{
+                                    getUsuario()
+                                    body.per_id = 0
+                                }}>Buscar</button>
+                            </div>
                         </div>
-                        <div className='flex'>
-                            <input type="text" id="table-search" className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={isId} onChange={(e)=>{
-                                setIsId(e.target.value)
-                                console.log(e.target.value);
-                            }} laceholder="Search"/>
-                            <button className='bg-cyan-600 text-gray-300 p-1 px-3 rounded-e' onClick={()=>{
-                                getUsuario()
-                                body.per_id = 0
-                            }}>Buscar</button>
-                        </div>
-                    </div>
-                        {isFound? <button className='px-4 py-2 bg-gray-800 text-white'  onClick={() => {
-                            setTitle('Crear')
-                            setBody(initialState)
-                            setIsEdit(false)
+                        {isFound? <button className='px-4 py-2 ml-96 bg-gray-800 text-white'  onClick={() => {
+                            setTitle('Crear');
+                            setBody(initialState);
+                            setIsEdit(false);
+                            getLabores();
                             setShowModal(true)}}>
                                 <i className='fa-solid fa-circle-plus'></i> Nuevo
                         </button> : null}
-                        </div>
+                    </div>
                 </div>
                 <table className="sticky w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -169,32 +219,30 @@ const EvaluacionC = () => {
                             <th scope='col' className='border px-6 py-3'>
                                 <div className='flex items-center'>
                                     <p className='pr-6 justify-center items-center'>Periodo</p>
-                                
-                                <select
-                                
-                                name="per_id"
-                                style={{
-                                    backgroundColor: 'withe',
-                                    padding: '8px',
-                                    borderRadius: '4px',
-                                    width: '70%',
-                                    color: 'lighgray',
-                                    fontSize: '14px',
-                                }}
-                                value={body.per_id}
-                                onChange={()=>{
-                                    onChange()
+                                    {isFound?
+                                        <select
+                                        
+                                        name="per_id"
+                                        style={{
+                                            backgroundColor: 'withe',
+                                            padding: '8px',
+                                            borderRadius: '4px',
+                                            width: '70%',
+                                            color: 'lighgray',
+                                            fontSize: '14px',
+                                        }}
+                                        value={body.per_id}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                            getEvaluaciones(e.target.value)
 
-                                }}
-                                onSelect={(e)=>{
-                                    console.log('Se selecciono', e.target.value);
-                                }}
-                                >
-                                    <option value={0}>Seleccionar Periodo</option>
-                                    {periodos.map(periodo => (
-                                        <option key={periodo.per_id} value={periodo.per_id}>{periodo.per_nombre}</option>
-                                    ))}  
-                                </select>
+                                        }}
+                                        >
+                                            <option value={0}>Seleccionar Periodo</option>
+                                            {periodos.map(periodo => (
+                                                <option key={periodo.per_id} value={periodo.per_id}>{periodo.per_nombre}</option>
+                                            ))}  
+                                        </select> : null}
                                 </div>
                             </th>
                         </tr>
@@ -223,23 +271,28 @@ const EvaluacionC = () => {
                             <th scope='col' className='border px-6 py-3'>Estado</th>
                             <th scope='col' className='border px-6 py-3'>Resultados</th>
                             <th scope='col' className='border px-6 py-3'>Evaluacion</th>
+                            <th scope='col' className='border px-6 py-3'>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {periodoList.map((periodo)=>(
-                        <tr key={periodo.per_id}>
-                            <td className='border px-6 py-4'>{periodo.per_id}</td>
-                            <td className='border px-6 py-4'>{periodo.per_nombre}</td>
-                            <td className='border px-6 py-4'>{periodo.per_fechainicio.split("T")[0]}</td>
-                            <td className='border px-6 py-4'>{periodo.per_fechafin.split("T")[0]}</td>
-                            <td className='border px-6 py-4'>{periodo.per_anno}</td>
-                            <td className='border px-6 py-4'>{periodo.per_semestre}</td>
+                    {evaluacionList.map((evaluacion,i)=>(
+                        <tr key={(i+1)}>
+                            {handleHora(evaluacion.lab_horas)}
+                            <td className='border px-6 py-4'>{(i+1)}</td>
+                            <td className='border px-6 py-4'>{evaluacion.lab_nombre}</td>
+                            <td className='border px-6 py-4'>{evaluacion.tl_descripcion}</td>
+                            <td className='border px-6 py-4'>{evaluacion.lab_horas}</td>
+                            <td className='border px-6 py-4'>{evaluacion.lab_descripcion}</td>
+                            <td className='border px-6 py-4 text-center'>X</td>
+                            <td className='border px-6 py-4'>{evaluacion.per_fechainicio.split("T")[0]}</td>
+                            <td className='border px-6 py-4'>{evaluacion.per_fechafin.split("T")[0]}</td>
+                            <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
+                            <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
                             <td className='border px-6 py-4'>
                                 <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
-                                    periodo.per_fechainicio = periodo.per_fechainicio.split("T")[0];
-                                    periodo.per_fechafin = periodo.per_fechafin.split("T")[0];
-                                    console.log(periodoList);
-                                    setBody(periodo)
+                                    //console.log(evaluacionList);
+                                    setBody(evaluacion)
                                     setTitle('Modificar')
                                     setIsEdit(true)
                                     setShowModal(true);}}
@@ -248,8 +301,8 @@ const EvaluacionC = () => {
                                 </button>    
                                 &nbsp;
                                 <button className='bg-red-700 text-gray-300 p-2 px-3 rounded'  onClick={() => {
-                                    setIdDelete(periodo.per_id)
-                                    setPeriodoDelete(periodo.per_nombre)
+                                    setIdDelete(evaluacion.per_id)
+                                    setPeriodoDelete(evaluacion.per_nombre)
                                     setShowModalDelete(true)
                                 }}>
                                     <i className='fa-solid fa-trash'></i>
@@ -258,6 +311,14 @@ const EvaluacionC = () => {
                         </tr>
                     ))}
                     </tbody>
+                    <tfoot className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td className='border px-6 py-4'>Total: </td>
+                            <td className='border px-6 py-4'>{totalHoras}</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
             {showModal ? (
@@ -265,58 +326,109 @@ const EvaluacionC = () => {
                 <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-gray-500">
                     <div className="relative w-full max-w-md max-h-full">
                         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <button type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => setShowModal(false)} >
-                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            <button type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => {
+                                setShowModal(false)
+                                setIsSelected(false)
+                            }} >
+                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
                                 <span className="sr-only text-black">Close modal</span>
                             </button>
                             <div className="px-6 py-6 lg:px-8">
-                                <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">{title} periodo</h3>
+                                <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">{title} evaluacion</h3>
                                 <form className="space-y-6" action="#">
                                     <div>
-                                        <label htmlFor="per_nombre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                        <input type="text" name="per_nombre" id="per_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" 
-                                        value={body.per_nombre}
-                                        onChange={onChange}
-                                        required/>
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Periodo</label>
+                                        <select
+                                        
+                                        name="per_id"
+                                        style={{
+                                            backgroundColor: 'withe',
+                                            padding: '8px',
+                                            borderRadius: '4px',
+                                            width: '100%',
+                                            color: 'lighgray',
+                                            fontSize: '14px',
+                                        }}
+                                        value={body.per_id}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                            getEvaluaciones(e.target.value)
+
+                                        }}
+                                        >
+                                            <option value={0}>Seleccionar Periodo</option>
+                                            {periodos.map(periodo => (
+                                                <option key={periodo.per_id} value={periodo.per_id}>{periodo.per_nombre}</option>
+                                            ))}  
+                                        </select>
                                     </div>
                                     <div>
-                                        <label htmlFor="per_fechainicio" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha inicio</label>
-                                        <input
-                                        type="date"
-                                        id="per_fechainicio"
-                                        name="per_fechainicio"
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Labor</label>
+                                        <select
+                                        
+                                        name="lab_id"
+                                        style={{
+                                            backgroundColor: 'withe',
+                                            padding: '8px',
+                                            borderRadius: '4px',
+                                            width: '100%',
+                                            color: 'lighgray',
+                                            fontSize: '14px',
+                                        }}
+                                        value={body.lab_id}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                            setIsSelected(true)
+                                        }}
+                                        >
+                                            <option value={0}>Seleccionar Labor</option>
+                                            {labores.map(labor => (
+                                                <option key={labor.lab_id} value={labor.lab_id}>{labor.lab_nombre}</option>
+                                            ))}  
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripcion labor</label>
+                                        <textarea
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Selecciona una fecha"
-                                        value={body.per_fechainicio}
-                                        onChange={onChange} required/>
+                                        disabled value={isSelected? `${labores.find((labor) => labor.lab_id === Number(body.lab_id)).lab_descripcion}`: ""}
+                                        />
 
                                     </div>
+                                    {isEdit?
                                     <div>
-                                        <label htmlFor="per_fechainicio" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha fin</label>
-                                        <input
-                                        type="date"
-                                        id="per_fechafin"
-                                        name="per_fechafin"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Selecciona una fecha"
-                                        value={body.per_fechafin}
-                                        onChange={onChange} required/>
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"></label>
+                                        <select
+                                        name="eva_estado"
+                                        style={{
+                                            backgroundColor: 'withe',
+                                            padding: '8px',
+                                            borderRadius: '4px',
+                                            width: '100%',
+                                            color: 'lighgray',
+                                            fontSize: '14px',
+                                        }}
+                                        value={body.eva_estado}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                        }}
+                                        disabled
+                                        >
+                                            <option value="En ejecucion">En ejecucion</option>
+                                            <option value="Terminado">Terminado</option>
+                                            <option value="Suspendido">Suspendido</option>
+                                        </select>
 
-                                    </div>
+                                    </div>:null}
+                                    {isEdit?
                                     <div>
-                                        <label htmlFor="per_anno" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ano</label>
-                                        <input type="number" name="per_anno" id="per_anno" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="ej:2020" min="2000" max="2024" maxLength="4" pattern="\d{4}"
-                                        value={body.per_anno}
-                                        onChange={onChange}
-                                        required/>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="per_semestre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Semestre</label>
-                                        <input type="number" name="per_semestre" id="per_semestre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" min="1" max="2" step="1" maxLength="1" pattern="[1-9]" 
-                                        value={body.per_semestre}
-                                        onChange={onChange}
-                                        required/>
-                                    </div>
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Resultados</label>
+                                        <textarea
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        disabled/>
+
+                                    </div>:null}
+                                    
                                     <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={isEdit ? () => onEdit() : () => onSubmit()
                                     }>{title}</button>
                                 </form>
@@ -333,7 +445,7 @@ const EvaluacionC = () => {
                     <div className="relative w-full max-w-md max-h-full">
                         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                             <button type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => setShowModalDelete(false)} >
-                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
                                 <span className="sr-only text-black">Close modal</span>
                             </button>
                             <div className="px-6 py-6 lg:px-8">

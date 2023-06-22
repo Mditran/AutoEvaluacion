@@ -7,9 +7,11 @@ const Labor = () => {
 
     //const url = 'http://localhost/4000/api';
     const initialState = {
-        labor_id: 1,
-        labor_nombre: "",
-        labor_horas: 0
+        lab_id: 1,
+        lab_nombre: "",
+        lab_descripcion:"",
+        lab_horas: 0,
+        tl_id: 1
     }
 
     const [laborList, setLaborList] = useState([]);
@@ -25,6 +27,7 @@ const Labor = () => {
 
     const getLabores = async () => {
         const { data } = await ApiRequest().get('/labores');
+        console.log(data);
         setLaborList(data);
     };
 
@@ -124,13 +127,15 @@ const Labor = () => {
                     </thead>
                     <tbody>
                         {laborList.map((labor) => (
-                            <tr key={labor.labor_id}>
-                                <td className='border px-6 py-4'>{labor.labor_id}</td>
-                                <td className='border px-6 py-4'>{labor.labor_nombre}</td>
-                                <td className='border px-6 py-4'>{labor.labor_horas}</td>
+                            
+                            <tr key={labor.lab_id}>
+                                {console.log('Hola', labor)}
+                                <td className='border px-6 py-4'>{labor.lab_id}</td>
+                                <td className='border px-6 py-4'>{labor.lab_nombre}</td>
+                                <td className='border px-6 py-4'>{labor.lab_horas}</td>
                                 <td className='border px-6 py-4'>
                                     <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
-                                        labor.labor_horas = Labor.labor_horas;
+                                        labor.lab_horas = Labor.lab_horas;
                                         console.log(laborList);
                                         setBody(labor)
                                         setTitle('Modificar')
