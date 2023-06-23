@@ -36,6 +36,8 @@ const Layout = () => {
 		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionD', token: 2, state: false },
 		{ title: 'Evaluacion', src: `${Chart}`, gap: true, path: '/app/evaluacionC', token: 1, state: false },
 		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionP', token: 3, state: false },
+		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionP', token: 4, state: false },
+		{ title: 'Evaluacion', src: `${User}`, path: '/app/evaluacionP', token: 5, state: false },
 
 		{ title: 'Periodos', src: `${Calendar}`, path: '/app/periodos', token: 1, state: false },
 		{ title: 'Labores', src: `${Folder}`,path:'/app/labores', token: 1, state: false},
