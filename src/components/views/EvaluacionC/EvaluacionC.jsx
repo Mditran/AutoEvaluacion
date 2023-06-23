@@ -20,6 +20,7 @@ const EvaluacionC = () => {
         
         eva_estado:"En ejecucion",
         eva_resultado:"",
+        eva_evidencia:"",
         eva_puntaje: 0,
         eva_sugerencias:'',
         eva_observaciones:'',
@@ -333,6 +334,7 @@ const EvaluacionC = () => {
                             <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_evidencia}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_sugerencias}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_observaciones}</td>
                             <td className='border px-6 py-4'>

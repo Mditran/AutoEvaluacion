@@ -20,6 +20,7 @@ const EvaluacionP = () => {
     
     eva_estado:"En ejecucion",
     eva_resultado:"",
+    eva_evidencia:'',
     eva_puntaje: 0,
     eva_sugerencias:'',
     eva_observaciones:'',
@@ -161,6 +162,7 @@ const EvaluacionP = () => {
                             <th scope='col' className='border px-6 py-3'>Fecha fin</th>
                             <th scope='col' className='border px-6 py-3'>Estado</th>
                             <th scope='col' className='border px-6 py-3'>Resultados</th>
+                            <th scope='col' className='border px-6 py-3'>Evidencias</th>
                             <th scope='col' className='border px-6 py-3'>Evaluacion</th>
                             <th scope='col' className='border px-6 py-3'>Sugerencias</th>
                             <th scope='col' className='border px-6 py-3'>Observaciones</th>
@@ -181,6 +183,7 @@ const EvaluacionP = () => {
                             <td className='border px-6 py-4'>{evaluacion.per_fechafin.split("T")[0]}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
+                            <td className='border px-6 py-4'>{evaluacion.eva_evidencia}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_sugerencias}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_observaciones}</td>
@@ -252,9 +255,10 @@ const EvaluacionP = () => {
                                         <div>
                                             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Documento</label>
                                             <input type='file'
+                                            name='eva_evidencia' id='eva_evidencia' 
                                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                            placeholder={body.eva_resultado}
-                                            onChange={(e) => body.eva_resultado = e.target.files[0].name}
+                                            placeholder={body.eva_evidencia}
+                                            onChange={(e) => body.eva_evidencia = e.target.files[0].name}
                                             required
                                             />
                                         </div>
