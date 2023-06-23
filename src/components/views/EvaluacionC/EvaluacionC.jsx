@@ -156,10 +156,11 @@ const EvaluacionC = () => {
         
 
         try {
-            await ApiRequest().post('/evaluaciones/guardar', body);
+            const {datoEvaluacion} = await ApiRequest().post('/evaluaciones/guardar', body);
             setBody(initialState);
             setIsSelected(false);
             getPeirodos2(usuario[0].usr_identificacion)
+            console.log('Dato evaluacion: ', datoEvaluacion);
             /* getEvaluaciones(); */
         } catch (error) {
             if (error.response) {
@@ -242,7 +243,7 @@ const EvaluacionC = () => {
                                 }}>Buscar</button>
                             </div>
                         </div>
-                        {(isFound && (Number(datosUsuario.usr_identificacion) !== usuario[0].usr_identificacion))? <button className='px-4 py-2 ml-96 bg-gray-800 text-white'  onClick={() => {
+                        {(isFound)? <button className='px-4 py-2 ml-96 bg-gray-800 text-white'  onClick={() => {
                             setTitle('Crear');
                             setBody(initialState);
                             setIsEdit(false);
