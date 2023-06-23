@@ -3,25 +3,28 @@ import ApiRequest from '../../../helpers/axiosInstances'
 
 const EvaluacionP = () => {
  //const url = 'http://localhost/4000/api';
-    const initialState = {
-        eva_id: 0,
-        lab_id: 0,
-        lab_nombre: "",
-        tl_id: 0,
-        tl_descripcion: "",
-        lab_descripcion: "",
-        lab_horas: 0,
-        per_id: 0,
-        per_nombre: "",
-        per_fechainicio: "",
-        per_fechafin: "",
-        usr_identificacion: 0,
-        rol_id: 0,
-        
-        eva_estado:"En ejecucion",
-        eva_resultado:"",
-        eva_puntaje: 0,
-	}
+ const initialState = {
+    eva_id: 0,
+    lab_id: 0,
+    lab_nombre: "",
+    tl_id: 0,
+    tl_descripcion: "",
+    lab_descripcion: "",
+    lab_horas: 0,
+    per_id: 0,
+    per_nombre: "",
+    per_fechainicio: "",
+    per_fechafin: "",
+    usr_identificacion: 0,
+    rol_id: 0,
+    
+    eva_estado:"En ejecucion",
+    eva_resultado:"",
+    eva_puntaje: 0,
+    eva_sugerencias:'',
+    eva_observaciones:'',
+
+}
 
     const datosUsuario = JSON.parse(localStorage.getItem('userData'));
 
@@ -159,12 +162,14 @@ const EvaluacionP = () => {
                             <th scope='col' className='border px-6 py-3'>Estado</th>
                             <th scope='col' className='border px-6 py-3'>Resultados</th>
                             <th scope='col' className='border px-6 py-3'>Evaluacion</th>
+                            <th scope='col' className='border px-6 py-3'>Sugerencias</th>
+                            <th scope='col' className='border px-6 py-3'>Observaciones</th>
                             <th scope='col' className='border px-6 py-3'>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {evaluacionList.map((evaluacion,i)=>(
-                        <tr key={evaluacion.eva_id}>
+                        <tr key={i}>
                             {handleHora(evaluacion.lab_horas)}
                             <td className='border px-6 py-4'>{(i+1)}</td>
                             <td className='border px-6 py-4'>{evaluacion.lab_nombre}</td>
@@ -177,6 +182,8 @@ const EvaluacionP = () => {
                             <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_sugerencias}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_observaciones}</td>
                             {isMenor? null:
                             <td className='border px-6 py-4'>
                                 <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
@@ -260,7 +267,18 @@ const EvaluacionP = () => {
                                         onChange={onChange}
                                         required/>
                                     </div>
-                                    
+                                    <div>
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sugerencias</label>
+                                        <textarea name='eva_sugerencias' id='eva_sugerencias' 
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        value={body.eva_sugerencias}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                            console.log(body.eva_sugerencias);
+                                        }}
+                                        />
+
+                                    </div>
                                     <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={onEdit}>Guardar</button>
                                 </form>
                             </div>

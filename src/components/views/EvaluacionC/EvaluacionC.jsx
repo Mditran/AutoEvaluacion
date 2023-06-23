@@ -21,12 +21,15 @@ const EvaluacionC = () => {
         eva_estado:"En ejecucion",
         eva_resultado:"",
         eva_puntaje: 0,
+        eva_sugerencias:'',
+        eva_observaciones:'',
+
 	}
     const initialStateUser = [{
         usr_identificacion: "",
         usr_nombre: "",
         usr_apellido: "",
-        user_rol:0
+        rol_id:0
 	}]
 
 	const [evaluacionList, setEvaluacionList] = useState([]);
@@ -34,6 +37,7 @@ const EvaluacionC = () => {
 	const [title, setTitle] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [showModalDelete, setShowModalDelete] = useState(false);
+    const [showModalMensaje, setShowModalMensaje] = useState(false);
 	const [idDelete, setIdDelete] = useState('');
 	const [periodoDelete, setPeriodoDelete] = useState('');
 	const [isId, setIsId] = useState('');
@@ -43,41 +47,54 @@ const EvaluacionC = () => {
 	const [isEdit, setIsEdit] = useState(false);
 	const [isSelected, setIsSelected] = useState(false);
 	const [isFound, setIsFound] = useState(false);
-	const [mensaje, setMensaje] = useState({ ident: null, message: null, type: null })
+	const [mensaje, setMensaje] = useState('')
     let totalHoras = 0;
 
     
 
     const getEvaluaciones = async (idPeriodo) => {
-		const { data } = await ApiRequest().post('/evaluaciones', {usr_identificacion: usuario[0].usr_identificacion, per_id: idPeriodo})
-        //console.log(data);
-		setEvaluacionList(data)
+		if(Number(idPeriodo)===0){
+            setEvaluacionList([])
+        }else{
+            const { data } = await ApiRequest().post('/evaluaciones', {usr_identificacion: usuario[0].usr_identificacion, per_id: idPeriodo})
+            //console.log(data);
+            setEvaluacionList(data)
+        }
 	}
 
     const getLabores = async (idPeriodo) => {
-		const { data } = await ApiRequest().get('/labores2')
+        if(usuario[0].rol_id === 3){
+		    const { data } = await ApiRequest().get('/labores3')
+            setLabores(data)
+        }else{
+            
+		    const { data } = await ApiRequest().get('/labores2')
+            setLabores(data)
+        }
         //console.log(data);
-		setLabores(data)
 	}
 
     const getUsuario = async () => {
-        //console.log(isId);
+        console.log(isId);
         try {
             const { data } = await ApiRequest().post('/usuario', { id: isId })
-            //console.log('data:',data);
             totalHoras = 0;
             if(data.length>0){
                 setUsuario(data);
+                getLabores()
                 setIsFound(true);
                 setEvaluacionList([])
-                getPeirodos2()
+                getPeirodos2(data[0].usr_identificacion)
             }else{
+                console.log('Manejo del mensaje');
                 setUsuario(initialStateUser)
                 setIsFound(false)
                 //console.log('El docente no existe1');
             }
         }
         catch({response}){
+            setMensaje('',response.data.message)
+            handleMesaje()
             setUsuario(initialStateUser)
             setEvaluacionList([])
             setIsFound(false)
@@ -85,11 +102,15 @@ const EvaluacionC = () => {
         }
 	}
 
-    const getPeirodos2 = async () => { 
-        await ApiRequest().post('/periodos2', {usr_identificacion: usuario[0].usr_identificacion})
+    const handleMesaje = async ()=>{
+        setShowModalMensaje(true)
+        console.log(showModalMensaje);
+    }
+
+    const getPeirodos2 = async (identification) => { 
+        await ApiRequest().post('/periodos2', {usr_identificacion: identification})
         .then(({data}) => {
             setPeriodos(data);
-            console.log(data);
         })
         .catch(({response})=>{
             console.log(response)
@@ -97,8 +118,8 @@ const EvaluacionC = () => {
 	} 
 
     useEffect(()=>{
-        
-    }, [])
+        console.log(showModalMensaje);
+    }, [showModalMensaje])
 
     const onChange = ({ target }) => {
         const { name, value } = target
@@ -145,7 +166,8 @@ const EvaluacionC = () => {
         const onEdit = async () => {
             try {
                 setShowModal(false)
-                const { data } = await ApiRequest().post('/periodos/editar', body)
+                console.log('Datos observacion', body.eva_observaciones);
+                const { data } = await ApiRequest().post('/evaluacionesC/editar', {body})
                 //handleDialog()
                 console.log('Hola: ',data);
                 setBody(initialState)
@@ -154,7 +176,8 @@ const EvaluacionC = () => {
                     message: data.message,
                     type: 'success'
                 })
-                getEvaluaciones()
+                console.log(usuario[0]);
+                getEvaluaciones(body.per_id)
             } catch ({ response }) {
                 setMensaje({
                     ident: new Date().getTime(),
@@ -166,13 +189,13 @@ const EvaluacionC = () => {
 
             const onDelete = async () => {
                 try {
-                    const { data } = await ApiRequest().post('/periodos/eliminar', { id: idDelete })
+                    const { data } = await ApiRequest().post('/evaluaciones/eliminar', { id: idDelete })
                     setMensaje({
                         ident: new Date().getTime(),
                         message: data.message,
                         type: 'success'
                     })
-                    getEvaluaciones()
+                    getEvaluaciones(body.per_id)
                 } catch ({ response }) {
                     setMensaje({
                         ident: new Date().getTime(),
@@ -271,6 +294,8 @@ const EvaluacionC = () => {
                             <th scope='col' className='border px-6 py-3'>Estado</th>
                             <th scope='col' className='border px-6 py-3'>Resultados</th>
                             <th scope='col' className='border px-6 py-3'>Evaluacion</th>
+                            <th scope='col' className='border px-6 py-3'>Sugerencias</th>
+                            <th scope='col' className='border px-6 py-3'>Observaciones</th>
                             <th scope='col' className='border px-6 py-3'>Acciones</th>
                         </tr>
                     </thead>
@@ -289,6 +314,8 @@ const EvaluacionC = () => {
                             <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_sugerencias}</td>
+                            <td className='border px-6 py-4 text-center'>{evaluacion.eva_observaciones}</td>
                             <td className='border px-6 py-4'>
                                 <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
                                     //console.log(evaluacionList);
@@ -301,8 +328,8 @@ const EvaluacionC = () => {
                                 </button>    
                                 &nbsp;
                                 <button className='bg-red-700 text-gray-300 p-2 px-3 rounded'  onClick={() => {
-                                    setIdDelete(evaluacion.per_id)
-                                    setPeriodoDelete(evaluacion.per_nombre)
+                                    setIdDelete(evaluacion.eva_id)
+                                    setPeriodoDelete(evaluacion.lab_nombre)
                                     setShowModalDelete(true)
                                 }}>
                                     <i className='fa-solid fa-trash'></i>
@@ -392,6 +419,7 @@ const EvaluacionC = () => {
                                         <textarea
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         disabled value={isSelected? `${labores.find((labor) => labor.lab_id === Number(body.lab_id)).lab_descripcion}`: ""}
+                                        placeholder={body.lab_descripcion}
                                         />
 
                                     </div>
@@ -412,7 +440,7 @@ const EvaluacionC = () => {
                                         onChange={(e)=>{
                                             onChange(e)
                                         }}
-                                        disabled
+                                        
                                         >
                                             <option value="En ejecucion">En ejecucion</option>
                                             <option value="Terminado">Terminado</option>
@@ -422,10 +450,15 @@ const EvaluacionC = () => {
                                     </div>:null}
                                     {isEdit?
                                     <div>
-                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Resultados</label>
-                                        <textarea
+                                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Observaciones</label>
+                                        <textarea name='eva_observaciones' id='eva_observaciones' 
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        disabled/>
+                                        value={body.eva_observaciones}
+                                        onChange={(e)=>{
+                                            onChange(e)
+                                            console.log(body.eva_observaciones);
+                                        }}
+                                        />
 
                                     </div>:null}
                                     
@@ -449,7 +482,7 @@ const EvaluacionC = () => {
                                 <span className="sr-only text-black">Close modal</span>
                             </button>
                             <div className="px-6 py-6 lg:px-8">
-                                <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">Desea eliminar el periodo {periodoDelete}</h3>
+                                <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">Desea eliminar la evalucion {periodoDelete}</h3>
                                 <div className='border px-6 py-6 pl-10 flex justify-evenly'>
                                     <button className='bg-green-600 text-gray-300 p-2 px-10 rounded' onClick={() => {
                                         onDelete();
@@ -465,6 +498,29 @@ const EvaluacionC = () => {
                                     }}>
                                         Cancelar
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </>
+            ) : null}
+            {showModalMensaje ? (
+                <>
+                <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-gray-500">
+                    <div className="relative w-full max-w-md max-h-full">
+                        <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <button type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" onClick={() => setShowModalMensaje(false)} >
+                                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
+                                <span className="sr-only text-black">Close modal</span>
+                            </button>
+                            <div className="px-6 py-6 lg:px-8">
+                                <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">{mensaje}</h3>
+                                <div className='border px-6 py-6 pl-10 flex justify-evenly'>
+                                    <button className='bg-green-600 text-gray-300 p-2 px-10 rounded' onClick={setShowModalMensaje(false)}
+                                        >
+                                        Aceptar 
+                                    </button>    
                                 </div>
                             </div>
                         </div>

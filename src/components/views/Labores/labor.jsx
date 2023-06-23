@@ -7,13 +7,13 @@ const Labor = () => {
     //const url = 'http://localhost/4000/api';
     const initialState = {
         lab_id: 0,
-        lab_nombre: "",
+        lab_nombre: '',
         lab_horas: '',
-        lab_estado:"Activa",
-        tl_codigo:"",
-        lab_descripcion:"",
+        lab_estado:'Activa',
+        tl_codigo:'',
+        lab_descripcion:'',
         tl_id: 0,
-        tl_descripcion:""
+        tl_descripcion:''
     }
 
     const [laborList, setLaborList] = useState([]);
