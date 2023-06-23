@@ -6,16 +6,18 @@ const Labor = () => {
 
     //const url = 'http://localhost/4000/api';
     const initialState = {
-        lab_id: 1,
+        lab_id: 0,
         lab_nombre: "",
-        lab_horas: 0,
+        lab_horas: '',
         lab_estado:"Activa",
         tl_codigo:"",
         lab_descripcion:"",
-        tl_id: 1
+        tl_id: 0,
+        tl_descripcion:""
     }
 
     const [laborList, setLaborList] = useState([]);
+    const [tipoLaborList, setTipoLaborList] = useState([]);
     const [body, setBody] = useState(initialState);
     const [title, setTitle] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -32,8 +34,15 @@ const Labor = () => {
         setLaborList(data);
     };
 
+    const getTipoLabores = async () => {
+        const { data } = await ApiRequest().get('/tipolabores');
+        console.log(data);
+        setTipoLaborList(data);
+    };
+
     useEffect(() => {
         getLabores();
+        getTipoLabores();
     }, []);
 
     const onChange = ({ target }) => {
@@ -181,17 +190,18 @@ const Labor = () => {
                                         <div>
                                             <label htmlFor="lab_nombre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
                                             <input type="text" name="lab_nombre" id="lab_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder=""
-                                                value={body.lab_nombre}
-                                                onChange={onChange}
-                                                required />
+                                            value={body.lab_nombre}
+                                            onChange={onChange}
+                                            required />
                                         </div>
                                         <div>
                                             <label htmlFor="lab_horas" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Horas</label>
                                             <input
-                                                type="string"
+                                                type="number"
                                                 id="lab_horas"
                                                 name="lab_horas"
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                min="2" max="6" step="1" maxLength="1" pattern="[1-9]"
                                                 placeholder=""
                                                 value={body.lab_horas}
                                                 onChange={onChange} required />
@@ -200,7 +210,7 @@ const Labor = () => {
                                         <div>
                                             
                                             <label htmlFor="lab_estado" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
-                                           {/*  <input
+                                            {/*  <input
                                                 type="string"
                                                 id="lab_estado"
                                                 name="lab_estado"
@@ -228,26 +238,37 @@ const Labor = () => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label htmlFor="tl_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Codigo</label>
-                                            <input
-                                                type="string"
-                                                id="tl_id"
-                                                name="tl_id"
-                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder=""
-                                                value={body.tl_id}
-                                                onChange={onChange} required />
-                                        </div>                                 
+                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo labor</label>
+                                            <select
+                                            
+                                            name="tl_id"
+                                            style={{
+                                                backgroundColor: 'withe',
+                                                padding: '8px',
+                                                borderRadius: '4px',
+                                                width: '100%',
+                                                color: 'lighgray',
+                                                fontSize: '14px',
+                                            }}
+                                            value={body.tl_id}
+                                            onChange={(e)=>{
+                                                onChange(e)
+                                            }}
+                                            >
+                                                <option value={0}>Seleccionar Labor</option>
+                                                {tipoLaborList.map(tipolabor => (
+                                                    <option key={tipolabor.tl_id} value={tipolabor.tl_id}>{tipolabor.tl_descripcion}</option>
+                                                ))}  
+                                            </select>
+                                        </div>                                
                                         <div>
                                             <label htmlFor="lab_descripcion" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripcion</label>
-                                            <input
-                                                type="string"
-                                                id="lab_descripcion"
+                                                <textarea id="lab_descripcion"
                                                 name="lab_descripcion"
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder=""
-                                                value={body.tl_descripcion}
-                                                onChange={onChange} required />
+                                                value={body.lab_descripcion}
+                                                onChange={onChange} required
+                                                />
                                         </div>         
 
                                         <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={isEdit ? () => onEdit() : () => onSubmit()
