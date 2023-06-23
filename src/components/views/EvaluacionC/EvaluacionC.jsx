@@ -32,6 +32,9 @@ const EvaluacionC = () => {
         rol_id:0
 	}]
 
+    const datosUsuario = JSON.parse(localStorage.getItem('userData'));
+
+
 	const [evaluacionList, setEvaluacionList] = useState([]);
 	const [body, setBody] = useState(initialState);
 	const [title, setTitle] = useState('');
@@ -117,6 +120,16 @@ const EvaluacionC = () => {
         })
 	} 
 
+    const getPeirodos3 = async (identification) => { 
+        await ApiRequest().get('/periodos3')
+        .then(({data}) => {
+            setPeriodos(data);
+        })
+        .catch(({response})=>{
+            console.log(response)
+        })
+	} 
+
     useEffect(()=>{
         console.log(showModalMensaje);
     }, [showModalMensaje])
@@ -146,6 +159,7 @@ const EvaluacionC = () => {
             await ApiRequest().post('/evaluaciones/guardar', body);
             setBody(initialState);
             setIsSelected(false);
+            getPeirodos2(usuario[0].usr_identificacion)
             /* getEvaluaciones(); */
         } catch (error) {
             if (error.response) {
@@ -195,7 +209,9 @@ const EvaluacionC = () => {
                         message: data.message,
                         type: 'success'
                     })
-                    getEvaluaciones(body.per_id)
+                    setEvaluacionList([])
+                    getPeirodos2(usuario[0].usr_identificacion)
+                    //getEvaluaciones(body.per_id)
                 } catch ({ response }) {
                     setMensaje({
                         ident: new Date().getTime(),
@@ -226,11 +242,13 @@ const EvaluacionC = () => {
                                 }}>Buscar</button>
                             </div>
                         </div>
-                        {isFound? <button className='px-4 py-2 ml-96 bg-gray-800 text-white'  onClick={() => {
+                        {(isFound && (Number(datosUsuario.usr_identificacion) !== usuario[0].usr_identificacion))? <button className='px-4 py-2 ml-96 bg-gray-800 text-white'  onClick={() => {
                             setTitle('Crear');
                             setBody(initialState);
                             setIsEdit(false);
+                            setIsSelected(false)
                             getLabores();
+                            getPeirodos3()
                             setShowModal(true)}}>
                                 <i className='fa-solid fa-circle-plus'></i> Nuevo
                         </button> : null}
@@ -379,7 +397,7 @@ const EvaluacionC = () => {
                                         value={body.per_id}
                                         onChange={(e)=>{
                                             onChange(e)
-                                            getEvaluaciones(e.target.value)
+                                            //getEvaluaciones(e.target.value)
 
                                         }}
                                         >

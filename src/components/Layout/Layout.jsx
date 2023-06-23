@@ -116,7 +116,7 @@ const Layout = () => {
 						<Route path="/periodos" element={<Periodo />} />
 						<Route path="/labores" element={(token === 1)? <Labor /> : <Navigate to="/app" />} />
 						<Route path="/periodos" element={(token === 1)? <Periodo /> : <Navigate to="/app" />} />
-						<Route path="/evaluacionC" element={(token === 1)? <EvaluacionC /> : <Navigate to="/app" />} />
+						<Route path="/evaluacionC" element={((token === 1) || (token === 2))? <EvaluacionC /> : <Navigate to="/app" />} />
 						<Route path="/evaluacionD" element={(token === 2)? <Periodo /> : <Navigate to="/app" />} />
 						<Route path="/evaluacionP" element={((token === 3) || (token === 4) || (token === 5))? <EvaluacionP /> : <Navigate to="/app" />} />
 					</Routes>
