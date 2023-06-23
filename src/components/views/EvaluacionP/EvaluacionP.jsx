@@ -29,6 +29,7 @@ const EvaluacionP = () => {
 	const [body, setBody] = useState(initialState);
     const [showModal, setShowModal] = useState(false);
 	const [periodos, setPeriodos] = useState([]);
+    const [isMenor, setIsMenor] = useState(false);
 	const [mensaje, setMensaje] = useState({ ident: null, message: null, type: null })
     let totalHoras = 0;
 
@@ -37,6 +38,17 @@ const EvaluacionP = () => {
     const getEvaluaciones = async (idPeriodo) => {
 		const { data } = await ApiRequest().post('/evaluaciones', {usr_identificacion: datosUsuario.usr_identificacion, per_id: idPeriodo})
         //console.log(data);
+        setIsMenor(false)
+        periodos.forEach((periodo)=>{
+            console.log(Number(idPeriodo)===periodo.per_id);
+            if(Number(idPeriodo)===periodo.per_id){
+                body.per_fechafin = periodo.per_fechafin;
+            }})
+        periodos.forEach((periodo)=>{
+                if(body.per_fechafin < periodo.per_fechafin){
+                    setIsMenor(true)
+            }
+        })
 		setEvaluacionList(data)
 	}
 
@@ -165,6 +177,7 @@ const EvaluacionP = () => {
                             <td className='border px-6 py-4'>{evaluacion.eva_estado}</td>
                             <td className='border px-6 py-4'>{evaluacion.eva_resultado}</td>
                             <td className='border px-6 py-4 text-center'>{evaluacion.eva_puntaje}</td>
+                            {isMenor? null:
                             <td className='border px-6 py-4'>
                                 <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
                                     //console.log(evaluacionList);
@@ -175,7 +188,7 @@ const EvaluacionP = () => {
                                 >
                                     <i className='fa-solid fa-edit'></i>    
                                 </button>    
-                            </td>
+                            </td>}
                         </tr>
                     ))}
                     </tbody>
@@ -222,21 +235,24 @@ const EvaluacionP = () => {
                                     </div>
                                     <div>
                                         <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Resultados</label>
-                                        {(datosUsuario.rol_id === 4 || datosUsuario.rol_id === 5)?<input type='file'
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder={body.eva_resultado}
-                                        onChange={(e) => body.eva_resultado = e.target.files[0].name}
-                                        required
-                                        />
-                                        : 
                                         <textarea name='eva_resultado' id='eva_resultado' className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         value={body.eva_resultado}
                                         onChange={onChange}
                                         required
                                         />
-                                        }
-
                                     </div>
+                                    {((datosUsuario.rol_id === 4 || datosUsuario.rol_id === 5) && body.tl_id !== 1)?
+                                        <div>
+                                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Documento</label>
+                                            <input type='file'
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            placeholder={body.eva_resultado}
+                                            onChange={(e) => body.eva_resultado = e.target.files[0].name}
+                                            required
+                                            />
+                                        </div>
+                                        :null
+                                        }
                                     <div>
                                         <label htmlFor="eva_puntaje" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Puntaje</label>
                                         <input type="number" name="eva_puntaje" id="eva_puntaje" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" min="0" max="100" step="1" maxLength="3" pattern="[1-9]" 

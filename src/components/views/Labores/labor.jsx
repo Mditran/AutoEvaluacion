@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ApiRequest from '../../../helpers/axiosInstances'
-import 'react-datepicker/dist/react-datepicker.module.css'
 
 
 const Labor = () => {
@@ -9,8 +8,10 @@ const Labor = () => {
     const initialState = {
         lab_id: 1,
         lab_nombre: "",
-        lab_descripcion:"",
         lab_horas: 0,
+        lab_estado:"Activa",
+        tl_codigo:"",
+        lab_descripcion:"",
         tl_id: 1
     }
 
@@ -122,6 +123,9 @@ const Labor = () => {
                             <th scope='col' className='border px-6 py-3'>#</th>
                             <th scope='col' className='border px-6 py-3'>Nombre</th>
                             <th scope='col' className='border px-6 py-3'>horas</th>
+                            <th scope='col' className='border px-6 py-3'>Estado</th>
+                            <th scope='col' className='border px-6 py-3'>Codigo</th>
+                            <th scope='col' className='border px-6 py-3'>Descripcion</th>
                             <th scope='col' className='border px-6 py-3'>Acciones</th>
                         </tr>
                     </thead>
@@ -133,9 +137,12 @@ const Labor = () => {
                                 <td className='border px-6 py-4'>{labor.lab_id}</td>
                                 <td className='border px-6 py-4'>{labor.lab_nombre}</td>
                                 <td className='border px-6 py-4'>{labor.lab_horas}</td>
+                                <td className='border px-6 py-4'>{labor.lab_estado}</td>
+                                <td className='border px-6 py-4'>{labor.tl_id}</td>
+                                <td className='border px-6 py-4'>{labor.lab_descripcion}</td>
                                 <td className='border px-6 py-4'>
                                     <button className='bg-yellow-400 text-black p-2 px-3 rounded' onClick={() => {
-                                        labor.lab_horas = Labor.lab_horas;
+                                        //labor.lab_horas = Labor.lab_horas;
                                         console.log(laborList);
                                         setBody(labor)
                                         setTitle('Modificar')
@@ -147,8 +154,8 @@ const Labor = () => {
                                     </button>
                                     &nbsp;
                                     <button className='bg-red-700 text-gray-300 p-2 px-3 rounded' onClick={() => {
-                                        setIdDelete(labor.labor_id)
-                                        setLaborDelete(labor.labor_nombre)
+                                        setIdDelete(labor.lab_id)
+                                        setLaborDelete(labor.lab_nombre)
                                         setShowModalDelete(true)
                                     }}>
                                         <i className='fa-solid fa-trash'></i>
@@ -172,31 +179,76 @@ const Labor = () => {
                                     <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">{title} labor</h3>
                                     <form className="space-y-6" action="#">
                                         <div>
-                                            <label htmlFor="labor_nombre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                            <input type="text" name="labor_nombre" id="labor_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com"
-                                                value={body.labor_nombre}
+                                            <label htmlFor="lab_nombre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+                                            <input type="text" name="lab_nombre" id="lab_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder=""
+                                                value={body.lab_nombre}
                                                 onChange={onChange}
                                                 required />
                                         </div>
                                         <div>
-                                            <label htmlFor="labor_horas" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha inicio</label>
+                                            <label htmlFor="lab_horas" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Horas</label>
                                             <input
-                                                type="date"
-                                                id="labor_horas"
-                                                name="labor_horas"
+                                                type="string"
+                                                id="lab_horas"
+                                                name="lab_horas"
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder="Selecciona una fecha"
-                                                value={body.labor_horas}
+                                                placeholder=""
+                                                value={body.lab_horas}
                                                 onChange={onChange} required />
 
                                         </div>
                                         <div>
-                                            <label htmlFor="labor_horas" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ano</label>
-                                            <input type="number" name="labor_horas" id="labor_horas" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="ej:2020" min="2000" max="2024" maxLength="4" pattern="\d{4}"
-                
-                                                onChange={onChange}
-                                                required />
+                                            
+                                            <label htmlFor="lab_estado" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
+                                           {/*  <input
+                                                type="string"
+                                                id="lab_estado"
+                                                name="lab_estado"
+                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder=""
+                                                value={body.lab_estado}
+                                                onChange={onChange} required /> */}
+                                            <select
+                                                name="lab_estado"
+                                                style={{
+                                                    backgroundColor: 'withe',
+                                                    padding: '8px',
+                                                    borderRadius: '4px',
+                                                    width: '100%',
+                                                    color: 'lighgray',
+                                                    fontSize: '14px',
+                                                }}
+                                                value={body.lab_estado}
+                                                onChange={(e)=>{
+                                                    onChange(e)
+                                                }}
+                                                >
+                                                    <option value="En ejecucion">Activo</option>
+                                                    <option value="Inactivo">Inactivo</option>
+                                            </select>
                                         </div>
+                                        <div>
+                                            <label htmlFor="tl_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Codigo</label>
+                                            <input
+                                                type="string"
+                                                id="tl_id"
+                                                name="tl_id"
+                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder=""
+                                                value={body.tl_id}
+                                                onChange={onChange} required />
+                                        </div>                                 
+                                        <div>
+                                            <label htmlFor="lab_descripcion" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripcion</label>
+                                            <input
+                                                type="string"
+                                                id="lab_descripcion"
+                                                name="lab_descripcion"
+                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                placeholder=""
+                                                value={body.tl_descripcion}
+                                                onChange={onChange} required />
+                                        </div>         
 
                                         <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={isEdit ? () => onEdit() : () => onSubmit()
                                         }>{title}</button>
@@ -248,3 +300,8 @@ const Labor = () => {
 
 
 export default Labor
+
+
+
+
+

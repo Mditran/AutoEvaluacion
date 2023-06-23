@@ -181,7 +181,7 @@ const Periodo = () => {
                                 <form className="space-y-6" action="#">
                                     <div>
                                         <label htmlFor="per_nombre" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                        <input type="text" name="per_nombre" id="per_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" 
+                                        <input type="text" name="per_nombre" id="per_nombre" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Nombre" 
                                         value={body.per_nombre}
                                         onChange={onChange}
                                         required/>
@@ -196,7 +196,6 @@ const Periodo = () => {
                                         placeholder="Selecciona una fecha"
                                         value={body.per_fechainicio}
                                         onChange={onChange} required/>
-
                                     </div>
                                     <div>
                                         <label htmlFor="per_fechainicio" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fecha fin</label>
