@@ -15,6 +15,7 @@ import Labor from '../views/Labores';
 import Periodo from '../views/Periodos';
 import EvaluacionC from '../views/EvaluacionC';
 import EvaluacionP from '../views/EvaluacionP';
+import Notificacion from '../views/Notificacion';
 
 const Layout = () => {
 	const [open, setOpen] = useState(true);
@@ -117,6 +118,7 @@ const Layout = () => {
 						<Route path="/labores" element={(token === 1)? <Labor /> : <Navigate to="/app" />} />
 						<Route path="/periodos" element={(token === 1)? <Periodo /> : <Navigate to="/app" />} />
 						<Route path="/evaluacionC" element={((token === 1) || (token === 2))? <EvaluacionC /> : <Navigate to="/app" />} />
+						<Route path="/notificaciones" element={((token === 1) || (token === 2))? <Notificacion /> : <Navigate to="/app" />} />
 						<Route path="/evaluacionD" element={(token === 2)? <Periodo /> : <Navigate to="/app" />} />
 						<Route path="/evaluacionP" element={((token === 3) || (token === 4) || (token === 5))? <EvaluacionP /> : <Navigate to="/app" />} />
 					</Routes>
